@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title><!-- EDIT: your name -->Your Name<!-- /EDIT --> — Field Geologist</title>
+<meta name="description" content="Geology field portfolio: projects, mission, CV, photography, and dispatches.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;1,9..144,400;1,9..144,500&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:        #1E1A16;
+    --ink-1:      #2A2622;
+    --ink-2:      #241F1B;
+    --ink-3:      #1E1A16;
+    --ink-4:      #181510;
+    --ink-5:      #120F0C;
+    --ink-6:      #0B0908;
+    --paper:      #EDE6D3;
+    --paper-dim:  #C9C0A8;
+    --rust:       #B1552C;
+    --ochre:      #C99A3D;
+    --verdigris:  #5C7B6C;
+    --amethyst:   #8A6E90;
+    --slate:      #7C8A93;
+    --line: rgba(237,230,211,0.14);
+    --max: 1180px;
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--ink);
+    color:var(--paper);
+    font-family:'IBM Plex Sans', system-ui, sans-serif;
+    font-weight:400;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    margin:0 0 .4em;
+    letter-spacing:-0.01em;
+  }
+  a{color:inherit;}
+  .mono{font-family:'IBM Plex Mono', monospace;}
+  .wrap{max-width:var(--max); margin:0 auto; padding:0 clamp(20px,5vw,56px);}
+  img,svg{display:block; max-width:100%;}
+
+  /* ---------- Skip link ---------- */
+  .skip{
+    position:absolute; left:-999px; top:0; background:var(--paper); color:var(--ink);
+    padding:10px 16px; z-index:200; font-family:'IBM Plex Mono',monospace; font-size:.8rem;
+  }
+  .skip:focus{left:12px; top:12px;}
+
+  /* ---------- Sticky bar ---------- */
+  .bar{
+    position:sticky; top:0; z-index:100;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px clamp(20px,5vw,56px);
+    background:rgba(30,26,22,0.86);
+    backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line);
+  }
+  .bar .name{
+    font-family:'Fraunces', serif; font-size:1rem; letter-spacing:.02em;
+  }
+  .bar nav{display:flex; gap:22px;}
+  .bar nav a{
+    font-family:'IBM Plex Mono', monospace; font-size:.72rem; text-transform:uppercase;
+    letter-spacing:.09em; text-decoration:none; color:var(--paper-dim);
+    padding-bottom:3px; border-bottom:1px solid transparent;
+    transition:color .2s ease, border-color .2s ease;
+  }
+  .bar nav a:hover, .bar nav a:focus-visible{color:var(--paper); border-color:var(--rust);}
+  .bar-links{display:none;}
+  @media(min-width:780px){.bar-links{display:flex;}}
+
+  /* ---------- Depth readout ---------- */
+  .depth-readout{
+    position:fixed; left:18px; bottom:18px; z-index:90;
+    font-family:'IBM Plex Mono', monospace; font-size:.72rem; color:var(--paper-dim);
+    background:rgba(0,0,0,0.35); border:1px solid var(--line);
+    padding:8px 12px; letter-spacing:.06em; pointer-events:none;
+  }
+  .depth-readout b{color:var(--paper); font-weight:500;}
+  @media(max-width:600px){.depth-readout{display:none;}}
+
+  /* ---------- Hero ---------- */
+  .hero{
+    padding:clamp(48px,9vw,96px) 0 clamp(32px,6vw,56px);
+  }
+  .hero-grid{
+    display:flex; flex-direction:column; gap:48px;
+  }
+  @media(min-width:900px){
+    .hero-grid{flex-direction:row; align-items:stretch; gap:64px;}
+    .hero-intro{flex:1.1;}
+    .hero-core{flex:0.9;}
+  }
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace; font-size:.74rem; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--ochre); margin-bottom:18px; display:block;
+  }
+  .hero h1{
+    font-size:clamp(2.6rem, 6vw, 4.4rem); line-height:1.02;
+  }
+  .hero .role{
+    font-family:'Fraunces', serif; font-style:italic; font-weight:400;
+    font-size:clamp(1.1rem,2vw,1.4rem); color:var(--paper-dim); margin:6px 0 24px;
+  }
+  .hero p.lede{
+    max-width:46ch; color:var(--paper-dim); font-size:1.02rem;
+  }
+  .coords{
+    margin-top:32px; display:flex; gap:28px; flex-wrap:wrap;
+    font-family:'IBM Plex Mono', monospace; font-size:.74rem; color:var(--paper-dim);
+  }
+  .coords span b{color:var(--paper); display:block; font-size:.78rem; margin-bottom:2px; font-weight:500;}
+
+  /* ---------- Core sample nav ---------- */
+  .core{
+    display:flex; flex-direction:column;
+    border:1px solid var(--line);
+    min-height:420px;
+  }
+  .stratum{
+    position:relative; flex:1; display:flex; flex-direction:column; justify-content:center;
+    padding:16px 20px; text-decoration:none; color:var(--paper);
+    border-bottom:1px solid var(--line);
+    overflow:hidden;
+    transition:padding-left .25s ease;
+  }
+  .stratum:last-child{border-bottom:none;}
+  .stratum:hover, .stratum:focus-visible{padding-left:30px;}
+  .stratum:focus-visible{outline:2px solid var(--paper); outline-offset:-4px;}
+  .stratum .depth{
+    font-family:'IBM Plex Mono', monospace; font-size:.68rem; color:rgba(237,230,211,0.65);
+    letter-spacing:.05em; position:relative; z-index:2;
+  }
+  .stratum .title{
+    font-family:'Fraunces', serif; font-weight:500; font-size:1.18rem; margin-top:3px;
+    position:relative; z-index:2;
+  }
+  .stratum .litho{
+    font-family:'IBM Plex Mono', monospace; font-size:.65rem; text-transform:uppercase;
+    letter-spacing:.1em; color:rgba(237,230,211,0.5); margin-top:2px; position:relative; z-index:2;
+  }
+  .stratum .arrow{
+    position:absolute; right:18px; top:50%; transform:translateY(-50%) translateX(-4px);
+    font-family:'IBM Plex Mono', monospace; opacity:0; transition:opacity .2s ease, transform .2s ease;
+    z-index:2;
+  }
+  .stratum:hover .arrow, .stratum:focus-visible .arrow{opacity:1; transform:translateY(-50%) translateX(0);}
+
+  .stratum::before{
+    content:""; position:absolute; inset:0; opacity:.5;
+  }
+  .s-sandstone::before{
+    background-image:radial-gradient(rgba(177,85,44,0.55) 1px, transparent 1.4px);
+    background-size:9px 9px;
+  }
+  .s-sandstone{background:linear-gradient(90deg, rgba(177,85,44,0.22), transparent 60%);}
+
+  .s-shale::before{
+    background-image:repeating-linear-gradient(0deg, rgba(140,180,165,0.35) 0 1px, transparent 1px 6px);
+  }
+  .s-shale{background:linear-gradient(90deg, rgba(92,123,108,0.22), transparent 60%);}
+
+  .s-granite::before{
+    background-image:
+      radial-gradient(rgba(124,138,147,0.55) 1px, transparent 1.4px),
+      radial-gradient(rgba(201,154,61,0.4) 1px, transparent 1.4px);
+    background-size:13px 13px, 17px 17px;
+    background-position:0 0, 6px 8px;
+  }
+  .s-granite{background:linear-gradient(90deg, rgba(124,138,147,0.22), transparent 60%);}
+
+  .s-schist::before{
+    background-image:repeating-linear-gradient(115deg, rgba(201,154,61,0.32) 0 2px, transparent 2px 10px);
+  }
+  .s-schist{background:linear-gradient(90deg, rgba(201,154,61,0.22), transparent 60%);}
+
+  .s-limestone::before{
+    background-image:
+      repeating-linear-gradient(0deg, rgba(138,110,144,0.3) 0 1px, transparent 1px 14px),
+      repeating-linear-gradient(90deg, rgba(138,110,144,0.22) 0 1px, transparent 1px 22px);
+  }
+  .s-limestone{background:linear-gradient(90deg, rgba(138,110,144,0.24), transparent 60%);}
+
+  /* ---------- Sections ---------- */
+  section.panel{
+    padding:clamp(56px,9vw,104px) 0;
+    border-top:1px solid var(--line);
+    scroll-margin-top:64px;
+  }
+  #geology-projects{background:var(--ink-1);}
+  #mission{background:var(--ink-2);}
+  #cv{background:var(--ink-3);}
+  #photography{background:var(--ink-4);}
+  #substack{background:var(--ink-5);}
+
+  .panel-head{
+    display:flex; flex-direction:column; gap:8px; margin-bottom:40px;
+    max-width:60ch;
+  }
+  .panel-head .depth-tag{
+    font-family:'IBM Plex Mono',monospace; font-size:.72rem; letter-spacing:.1em;
+    text-transform:uppercase;
+  }
+  .panel-head h2{font-size:clamp(1.9rem,4vw,2.6rem);}
+  .panel-head p{color:var(--paper-dim); max-width:56ch;}
+
+  .accent-rust .depth-tag{color:var(--rust);}
+  .accent-verdigris .depth-tag{color:var(--verdigris);}
+  .accent-slate .depth-tag{color:var(--slate);}
+  .accent-ochre .depth-tag{color:var(--ochre);}
+  .accent-amethyst .depth-tag{color:var(--amethyst);}
+
+  .btn{
+    display:inline-flex; align-items:center; gap:8px;
+    font-family:'IBM Plex Mono', monospace; font-size:.78rem; text-transform:uppercase;
+    letter-spacing:.08em; text-decoration:none; color:var(--ink);
+    background:var(--paper); padding:13px 22px; border:1px solid var(--paper);
+    transition:background .2s ease, color .2s ease;
+  }
+  .btn:hover, .btn:focus-visible{background:transparent; color:var(--paper);}
+  .btn.ghost{background:transparent; color:var(--paper);}
+  .btn.ghost:hover, .btn.ghost:focus-visible{background:var(--paper); color:var(--ink);}
+
+  /* Project cards */
+  .grid-3{display:grid; grid-template-columns:1fr; gap:1px; background:var(--line); border:1px solid var(--line);}
+  @media(min-width:720px){.grid-3{grid-template-columns:repeat(3,1fr);}}
+  .card{
+    background:var(--ink-1); padding:28px 24px; text-decoration:none; color:var(--paper);
+    display:flex; flex-direction:column; min-height:220px;
+    transition:background .2s ease;
+  }
+  .card:hover, .card:focus-visible{background:#332D27;}
+  .card .tag{
+    font-family:'IBM Plex Mono', monospace; font-size:.66rem; text-transform:uppercase;
+    letter-spacing:.09em; color:var(--rust); margin-bottom:14px;
+  }
+  .card h3{font-size:1.15rem; margin-bottom:8px;}
+  .card p{color:var(--paper-dim); font-size:.92rem; flex:1;}
+  .card .go{font-family:'IBM Plex Mono',monospace; font-size:.72rem; margin-top:16px; color:var(--paper-dim);}
+  .projects-cta{margin-top:28px;}
+
+  /* Mission */
+  .mission-quote{
+    font-family:'Fraunces', serif; font-style:italic; font-weight:400;
+    font-size:clamp(1.3rem,3vw,1.9rem); line-height:1.5; max-width:34ch;
+    color:var(--paper); border-left:2px solid var(--verdigris); padding-left:24px;
+    margin:0 0 32px;
+  }
+  .mission-body{max-width:64ch; color:var(--paper-dim);}
+  .mission-body p{margin:0 0 16px;}
+
+  /* CV */
+  .cv-layout{display:flex; flex-direction:column; gap:36px;}
+  @media(min-width:820px){.cv-layout{flex-direction:row; justify-content:space-between; align-items:flex-end;}}
+  .cv-summary{max-width:56ch; color:var(--paper-dim);}
+  .cv-actions{display:flex; gap:14px; flex-wrap:wrap;}
+  .cv-stats{display:flex; gap:32px; margin-top:28px; flex-wrap:wrap;}
+  .cv-stats div b{
+    display:block; font-family:'Fraunces',serif; font-size:1.7rem; color:var(--slate);
+  }
+  .cv-stats div span{font-family:'IBM Plex Mono',monospace; font-size:.7rem; text-transform:uppercase; letter-spacing:.08em; color:var(--paper-dim);}
+
+  /* Photography */
+  .photo-grid{
+    display:grid; grid-template-columns:repeat(2,1fr); gap:1px; background:var(--line); border:1px solid var(--line);
+    margin-bottom:32px;
+  }
+  @media(min-width:720px){.photo-grid{grid-template-columns:repeat(3,1fr);}}
+  .photo-tile{
+    aspect-ratio:4/5; position:relative; overflow:hidden;
+  }
+  .photo-tile span{
+    position:absolute; left:12px; bottom:10px; font-family:'IBM Plex Mono',monospace;
+    font-size:.66rem; color:rgba(237,230,211,0.85); letter-spacing:.05em;
+  }
+  .photo-tile.t1{background:linear-gradient(160deg,#4A5A63,#1E1A16);}
+  .photo-tile.t2{background:linear-gradient(160deg,#B1552C,#241F1B);}
+  .photo-tile.t3{background:linear-gradient(160deg,#5C7B6C,#181510);}
+  .photo-tile.t4{background:linear-gradient(160deg,#C99A3D,#1E1A16);}
+  .photo-tile.t5{background:linear-gradient(160deg,#8A6E90,#181510);}
+  .photo-tile.t6{background:linear-gradient(160deg,#7C8A93,#241F1B);}
+
+  /* Substack */
+  .substack-window{
+    border:1px solid var(--line); background:var(--ink-6);
+    padding:4px; max-width:560px;
+  }
+  .substack-window iframe{width:100%; height:320px; border:none; background:var(--paper);}
+  .substack-fallback{
+    margin-top:18px; font-family:'IBM Plex Mono',monospace; font-size:.78rem; color:var(--paper-dim);
+  }
+  .substack-fallback a{color:var(--amethyst); text-decoration:underline;}
+
+  /* Footer */
+  footer{
+    background:var(--ink-6); border-top:1px solid var(--line);
+    padding:44px 0 32px;
+  }
+  .foot-grid{display:flex; flex-wrap:wrap; justify-content:space-between; gap:24px; margin-bottom:28px;}
+  .foot-grid a{text-decoration:none; color:var(--paper-dim); font-family:'IBM Plex Mono',monospace; font-size:.78rem;}
+  .foot-grid a:hover, .foot-grid a:focus-visible{color:var(--paper);}
+  .scalebar{display:flex; align-items:center; gap:10px; font-family:'IBM Plex Mono',monospace; font-size:.65rem; color:var(--paper-dim); margin-bottom:18px;}
+  .scalebar .ticks{display:flex; height:8px; border:1px solid var(--paper-dim); width:120px;}
+  .scalebar .ticks div{flex:1; border-right:1px solid var(--paper-dim);}
+  .scalebar .ticks div:nth-child(even){background:var(--paper-dim);}
+  .copyright{font-family:'IBM Plex Mono',monospace; font-size:.68rem; color:rgba(237,230,211,0.45);}
+
+  @media(prefers-reduced-motion:reduce){
+    html{scroll-behavior:auto;}
+    *{transition:none !important;}
+  }
+</style>
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<div class="bar">
+  <div class="name">
+    <!-- EDIT: your name / site name --> Your Name
+  </div>
+  <nav class="bar-links" aria-label="Section navigation">
+    <a href="#geology-projects">Projects</a>
+    <a href="#mission">Mission</a>
+    <a href="#cv">CV</a>
+    <a href="#photography">Photography</a>
+    <a href="#substack">Substack</a>
+  </nav>
+</div>
+
+<div class="depth-readout" id="depthReadout">DEPTH <b>00.0 m</b></div>
+
+<main id="main">
+
+  <section class="hero wrap">
+    <div class="hero-grid">
+      <div class="hero-intro">
+        <span class="eyebrow">Field Portfolio</span>
+        <h1><!-- EDIT: your name -->Your Name</h1>
+        <p class="role">Geologist — <!-- EDIT: specialty, e.g. "Sedimentary Systems & Field Photography" -->your specialty here</p>
+        <p class="lede">
+          <!-- EDIT: one or two sentence intro -->
+          A short introduction to your work in the field: the regions you study, the questions
+          that drive you, and what visitors will find as they scroll deeper into this page.
+        </p>
+        <div class="coords">
+          <span><b>Based in</b><!-- EDIT -->City, State</span>
+          <span><b>Field seasons</b><!-- EDIT -->2019–present</span>
+          <span><b>Contact</b><!-- EDIT --><a href="mailto:you@example.com" style="color:inherit;">you@example.com</a></span>
+        </div>
+      </div>
+
+      <div class="hero-core">
+        <nav class="core" aria-label="Core sample navigation">
+          <a class="stratum s-sandstone" href="#geology-projects">
+            <span class="depth mono">0.0 – 4.2 m &middot; sandstone</span>
+            <span class="title">Geology Projects</span>
+            <span class="litho">field studies &amp; maps</span>
+            <span class="arrow mono">→</span>
+          </a>
+          <a class="stratum s-shale" href="#mission">
+            <span class="depth mono">4.2 – 6.0 m &middot; shale</span>
+            <span class="title">Mission Statement</span>
+            <span class="litho">why the work matters</span>
+            <span class="arrow mono">→</span>
+          </a>
+          <a class="stratum s-granite" href="#cv">
+            <span class="depth mono">6.0 – 9.5 m &middot; granite</span>
+            <span class="title">CV / Field Record</span>
+            <span class="litho">experience &amp; credentials</span>
+            <span class="arrow mono">→</span>
+          </a>
+          <a class="stratum s-schist" href="#photography">
+            <span class="depth mono">9.5 – 13.1 m &middot; schist</span>
+            <span class="title">Photography</span>
+            <span class="litho">the visual record</span>
+            <span class="arrow mono">→</span>
+          </a>
+          <a class="stratum s-limestone" href="#substack">
+            <span class="depth mono">13.1 – 15.0 m &middot; limestone</span>
+            <span class="title">Dispatches</span>
+            <span class="litho">substack notebook</span>
+            <span class="arrow mono">→</span>
+          </a>
+        </nav>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= GEOLOGY PROJECTS ================= -->
+  <section id="geology-projects" class="panel">
+    <div class="wrap">
+      <div class="panel-head accent-rust">
+        <span class="depth-tag mono">0.0 – 4.2 m / sandstone</span>
+        <h2>Geology Projects</h2>
+        <p>
+          <!-- EDIT: short intro to your project archive -->
+          Fieldwork, mapping, and analysis from current and past projects. Each one opens into
+          its own folder with full write-ups, data, and figures.
+        </p>
+      </div>
+
+      <div class="grid-3">
+        <!-- EDIT: replace with real projects; href should point at each project's folder -->
+        <a class="card" href="geology-projects/project-one/">
+          <span class="tag mono">Sedimentology</span>
+          <h3>Basin Mapping, West Range</h3>
+          <p>Stratigraphic correlation and depositional history across three formations.</p>
+          <span class="go mono">Open folder →</span>
+        </a>
+        <a class="card" href="geology-projects/project-two/">
+          <span class="tag mono">Structural</span>
+          <h3>Fault Kinematics Study</h3>
+          <p>Field measurements and cross-sections characterizing a regional fault system.</p>
+          <span class="go mono">Open folder →</span>
+        </a>
+        <a class="card" href="geology-projects/project-three/">
+          <span class="tag mono">Petrology</span>
+          <h3>Mineral Assemblage Survey</h3>
+          <p>Thin-section and hand-sample analysis of an igneous intrusion complex.</p>
+          <span class="go mono">Open folder →</span>
+        </a>
+      </div>
+
+      <div class="projects-cta">
+        <!-- EDIT: link to the full projects index folder -->
+        <a class="btn ghost" href="geology-projects/">View all projects →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= MISSION ================= -->
+  <section id="mission" class="panel">
+    <div class="wrap">
+      <div class="panel-head accent-verdigris">
+        <span class="depth-tag mono">4.2 – 6.0 m / shale</span>
+        <h2>Mission Statement</h2>
+      </div>
+
+      <p class="mission-quote">
+        <!-- EDIT: your mission statement pull-quote -->
+        "Rock is a record. My work is learning to read it carefully, and to help others read it too."
+      </p>
+
+      <div class="mission-body">
+        <!-- EDIT: expand on your mission / values / approach -->
+        <p>Write a few paragraphs here about what draws you to geology, the kind of work you
+        want to be known for, and the values that guide your fieldwork and analysis.</p>
+        <p>This is also a good place to mention the audiences you serve — students, industry,
+        the public — and what you hope people take away from your portfolio.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= CV ================= -->
+  <section id="cv" class="panel">
+    <div class="wrap">
+      <div class="panel-head accent-slate">
+        <span class="depth-tag mono">6.0 – 9.5 m / granite</span>
+        <h2>CV / Field Record</h2>
+      </div>
+
+      <div class="cv-layout">
+        <div>
+          <p class="cv-summary">
+            <!-- EDIT: 2–3 sentence CV summary -->
+            A brief summary of your education, field experience, and areas of expertise —
+            enough to orient a visitor before they open the full document.
+          </p>
+          <div class="cv-stats">
+            <div><b><!-- EDIT -->6</b><span>Field seasons</span></div>
+            <div><b><!-- EDIT -->12</b><span>Projects</span></div>
+            <div><b><!-- EDIT -->3</b><span>Publications</span></div>
+          </div>
+        </div>
+        <div class="cv-actions">
+          <!-- EDIT: point at your actual PDF and CV folder -->
+          <a class="btn" href="cv/cv.pdf">Download PDF ↓</a>
+          <a class="btn ghost" href="cv/">View full record →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= PHOTOGRAPHY ================= -->
+  <section id="photography" class="panel">
+    <div class="wrap">
+      <div class="panel-head accent-ochre">
+        <span class="depth-tag mono">9.5 – 13.1 m / schist</span>
+        <h2>Photography</h2>
+        <p>
+          <!-- EDIT: intro to your photography folder -->
+          Landscapes, outcrops, and field life from behind the lens.
+        </p>
+      </div>
+
+      <div class="photo-grid" aria-hidden="true">
+        <div class="photo-tile t1"><span>outcrop, 04</span></div>
+        <div class="photo-tile t2"><span>ridge line</span></div>
+        <div class="photo-tile t3"><span>core samples</span></div>
+        <div class="photo-tile t4"><span>golden hour</span></div>
+        <div class="photo-tile t5"><span>traverse</span></div>
+        <div class="photo-tile t6"><span>fold detail</span></div>
+      </div>
+
+      <!-- EDIT: point at your real photography folder; swap tiles above for real <img> once you have assets -->
+      <a class="btn ghost" href="photography/">Enter gallery →</a>
+    </div>
+  </section>
+
+  <!-- ================= SUBSTACK ================= -->
+  <section id="substack" class="panel">
+    <div class="wrap">
+      <div class="panel-head accent-amethyst">
+        <span class="depth-tag mono">13.1 – 15.0 m / limestone</span>
+        <h2>Dispatches</h2>
+        <p>
+          <!-- EDIT --> Field notes and long-form writing, sent out on Substack.
+        </p>
+      </div>
+
+      <div class="substack-window">
+        <!-- EDIT: replace "yourname" with your actual Substack subdomain -->
+        <iframe src="https://yourname.substack.com/embed" title="Substack subscribe form"></iframe>
+      </div>
+      <p class="substack-fallback">
+        Prefer to read first? <a href="https://yourname.substack.com">Browse the archive on Substack ↗</a>
+      </p>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="scalebar">
+      <span>SCALE</span>
+      <div class="ticks"><div></div><div></div><div></div><div></div><div></div><div></div></div>
+      <span>0 — 1 m</span>
+    </div>
+    <div class="foot-grid">
+      <!-- EDIT: your real links -->
+      <a href="mailto:you@example.com">EMAIL</a>
+      <a href="https://linkedin.com/in/yourname">LINKEDIN</a>
+      <a href="geology-projects/">PROJECTS</a>
+      <a href="cv/">CV</a>
+      <a href="photography/">PHOTOGRAPHY</a>
+      <a href="https://yourname.substack.com">SUBSTACK</a>
+    </div>
+    <div class="copyright mono">
+      &copy; <span id="year"></span> <!-- EDIT: your name -->Your Name. Field portfolio.
+    </div>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  // Depth readout — maps scroll progress to the core's 0–15 m scale
+  var readout = document.getElementById('depthReadout');
+  function updateDepth(){
+    var doc = document.documentElement;
+    var scrollable = doc.scrollHeight - doc.clientHeight;
+    var progress = scrollable > 0 ? window.scrollY / scrollable : 0;
+    var depth = (progress * 15).toFixed(1);
+    readout.innerHTML = 'DEPTH <b>' + depth + ' m</b>';
+  }
+  window.addEventListener('scroll', updateDepth, { passive: true });
+  window.addEventListener('resize', updateDepth);
+  updateDepth();
+</script>
+
+</body>
+</html>
