@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Field Catalog — Specimen Collection</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,500;9..144,600&family=JetBrains+Mono:wght@400;500;600&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --basalt:      #15130f;
+    --basalt-2:    #1c1912;
+    --basalt-3:    #221e16;
+    --sandstone:   #ddd0b8;
+    --sandstone-2: #c9bca3;
+    --slate:       #85847a;
+    --oxide:       #c1602c;
+    --oxide-dim:   #7d4322;
+    --malachite:   #4a8672;
+    --umber:       #7a5c3e;
+    --hairline:    rgba(221,208,184,0.13);
+    --hairline-2:  rgba(221,208,184,0.06);
+  }
+
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+
+  body{
+    margin:0;
+    background:var(--basalt);
+    color:var(--sandstone);
+    font-family:'Inter', sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+
+  /* ---------- background texture: faint topographic contours ---------- */
+  .contours{
+    position:fixed; inset:0;
+    pointer-events:none;
+    opacity:0.05;
+    background-image:
+      repeating-radial-gradient(circle at 12% 18%, transparent 0, transparent 26px, var(--sandstone) 27px, transparent 28px, transparent 70px),
+      repeating-radial-gradient(circle at 88% 82%, transparent 0, transparent 34px, var(--sandstone) 35px, transparent 36px, transparent 90px);
+    z-index:0;
+  }
+
+  .wrap{
+    position:relative; z-index:1;
+    max-width:1180px;
+    margin:0 auto;
+    padding:0 32px 120px;
+  }
+
+  /* ---------- header ---------- */
+  header{
+    padding:88px 0 40px;
+  }
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px;
+    letter-spacing:0.16em;
+    text-transform:uppercase;
+    color:var(--oxide);
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:22px;
+  }
+  .eyebrow::before{
+    content:'';
+    width:22px; height:1px;
+    background:var(--oxide);
+    display:inline-block;
+  }
+  h1{
+    font-family:'Fraunces', serif;
+    font-optical-sizing:auto;
+    font-weight:400;
+    font-size:clamp(40px, 6vw, 68px);
+    line-height:1.02;
+    letter-spacing:-0.01em;
+    margin:0 0 20px;
+    color:var(--sandstone);
+  }
+  h1 em{
+    font-style:italic;
+    font-weight:300;
+    color:var(--sandstone-2);
+  }
+  .lede{
+    max-width:560px;
+    font-size:16px;
+    line-height:1.6;
+    color:var(--slate);
+    margin:0;
+  }
+
+  /* ---------- strata divider (signature element) ---------- */
+  .strata{
+    display:flex;
+    height:10px;
+    border-radius:2px;
+    overflow:hidden;
+    margin:44px 0 8px;
+  }
+  .strata span{ flex:1; }
+
+  .strata-caption{
+    display:flex;
+    justify-content:space-between;
+    font-family:'JetBrains Mono', monospace;
+    font-size:10.5px;
+    letter-spacing:0.06em;
+    color:var(--slate);
+    text-transform:uppercase;
+    margin-bottom:70px;
+  }
+  .strata-caption .legend{
+    display:flex;
+    gap:18px;
+  }
+  .legend-item{ display:flex; align-items:center; gap:6px; }
+  .swatch{ width:8px; height:8px; border-radius:50%; display:inline-block; }
+
+  /* ---------- grid ---------- */
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(270px, 1fr));
+    gap:28px;
+  }
+
+  .specimen{
+    background:var(--basalt-2);
+    border:1px solid var(--hairline);
+    border-radius:3px;
+    overflow:hidden;
+    cursor:pointer;
+    position:relative;
+    transition:transform 0.35s cubic-bezier(.2,.8,.2,1), border-color 0.35s ease, box-shadow 0.35s ease;
+  }
+  .specimen:hover{
+    transform:translateY(-4px);
+    border-color:rgba(221,208,184,0.28);
+    box-shadow:0 22px 40px -20px rgba(0,0,0,0.6);
+  }
+  .specimen:focus-visible{
+    outline:2px solid var(--oxide);
+    outline-offset:3px;
+  }
+
+  .thumb-frame{
+    position:relative;
+    aspect-ratio:3/4;
+    background:var(--basalt-3);
+    overflow:hidden;
+    border-bottom:1px solid var(--hairline);
+  }
+  .thumb-frame canvas,
+  .thumb-frame img{
+    width:100%; height:100%;
+    object-fit:cover;
+    object-position:top center;
+    display:block;
+    opacity:0;
+    transition:opacity 0.5s ease;
+  }
+  .thumb-frame canvas.loaded,
+  .thumb-frame img.loaded{ opacity:1; }
+
+  .thumb-fallback{
+    position:absolute; inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    gap:10px;
+    background:
+      repeating-linear-gradient(180deg, var(--basalt-3) 0px, var(--basalt-3) 18px, #1f1b14 18px, #1f1b14 19px);
+  }
+  .thumb-fallback svg{ width:34px; height:34px; opacity:0.35; }
+  .thumb-fallback span{
+    font-family:'JetBrains Mono', monospace;
+    font-size:10px;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--slate);
+  }
+
+  .accession{
+    position:absolute;
+    top:12px; left:12px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.05em;
+    color:var(--sandstone);
+    background:rgba(21,19,15,0.72);
+    backdrop-filter:blur(3px);
+    padding:4px 8px;
+    border-radius:2px;
+    border:1px solid var(--hairline);
+    transition:color 0.3s ease, border-color 0.3s ease;
+  }
+  .specimen:hover .accession{
+    color:var(--oxide);
+    border-color:var(--oxide-dim);
+  }
+
+  .type-tab{
+    position:absolute;
+    top:12px; right:12px;
+    width:9px; height:9px;
+    border-radius:50%;
+    box-shadow:0 0 0 3px rgba(21,19,15,0.72);
+  }
+
+  .plate{
+    padding:16px 16px 18px;
+  }
+  .plate .title{
+    font-family:'Fraunces', serif;
+    font-weight:500;
+    font-size:16.5px;
+    line-height:1.28;
+    color:var(--sandstone);
+    margin:0 0 6px;
+  }
+  .plate .subtext{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.03em;
+    color:var(--slate);
+    margin:0;
+  }
+
+  /* ---------- footer note ---------- */
+  .footnote{
+    margin-top:64px;
+    padding-top:24px;
+    border-top:1px solid var(--hairline-2);
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    color:var(--slate);
+    letter-spacing:0.03em;
+  }
+
+  /* ---------- lightbox ---------- */
+  .lightbox{
+    position:fixed; inset:0;
+    background:rgba(10,9,7,0.88);
+    backdrop-filter:blur(4px);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:40px 20px;
+    z-index:100;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity 0.3s ease;
+  }
+  .lightbox.open{ opacity:1; pointer-events:auto; }
+
+  .lightbox-panel{
+    width:min(880px, 100%);
+    max-height:88vh;
+    background:var(--basalt-2);
+    border:1px solid var(--hairline);
+    border-radius:4px;
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+    transform:translateY(14px);
+    transition:transform 0.35s cubic-bezier(.2,.8,.2,1);
+  }
+  .lightbox.open .lightbox-panel{ transform:translateY(0); }
+
+  .lightbox-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:20px;
+    padding:20px 24px;
+    border-bottom:1px solid var(--hairline);
+  }
+  .lightbox-head .title{
+    font-family:'Fraunces', serif;
+    font-size:20px;
+    color:var(--sandstone);
+    margin:0 0 4px;
+  }
+  .lightbox-head .subtext{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    color:var(--slate);
+    margin:0;
+  }
+  .lightbox-actions{
+    display:flex;
+    gap:10px;
+    flex-shrink:0;
+  }
+  .lightbox-actions a,
+  .lightbox-actions button{
+    font-family:'JetBrains Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.04em;
+    text-transform:uppercase;
+    color:var(--sandstone);
+    background:transparent;
+    border:1px solid var(--hairline);
+    border-radius:2px;
+    padding:8px 12px;
+    cursor:pointer;
+    text-decoration:none;
+    transition:border-color 0.25s ease, color 0.25s ease;
+  }
+  .lightbox-actions a:hover,
+  .lightbox-actions button:hover{
+    border-color:var(--oxide);
+    color:var(--oxide);
+  }
+
+  .lightbox-body{
+    flex:1;
+    min-height:0;
+    background:#0c0b09;
+  }
+  .lightbox-body iframe{
+    width:100%; height:100%;
+    min-height:60vh;
+    border:none;
+    display:block;
+  }
+
+  @media (max-width:600px){
+    header{ padding:56px 0 32px; }
+    .wrap{ padding:0 20px 90px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="contours"></div>
+
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">Geologic Survey — Student Collection</div>
+    <h1>Field Catalog of<br><em>Specimens &amp; Coursework</em></h1>
+    <p class="lede">Posters, essays, and analyses from four years in the field and the lab — catalogued below by accession number.</p>
+
+    <div class="strata">
+      <span style="background:var(--oxide)"></span>
+      <span style="background:var(--umber)"></span>
+      <span style="background:var(--malachite)"></span>
+      <span style="background:var(--sandstone-2)"></span>
+      <span style="background:var(--oxide-dim)"></span>
+    </div>
+    <div class="strata-caption">
+      <span id="specimen-count">12 specimens catalogued</span>
+      <span class="legend">
+        <span class="legend-item"><span class="swatch" style="background:var(--oxide)"></span>Poster</span>
+        <span class="legend-item"><span class="swatch" style="background:var(--malachite)"></span>Essay</span>
+        <span class="legend-item"><span class="swatch" style="background:var(--sandstone-2)"></span>Code / Analysis</span>
+      </span>
+    </div>
+  </header>
+
+  <div class="grid" id="grid"></div>
+
+  <p class="footnote">Click a specimen to view the original document. Thumbnails render live from the first page of each PDF.</p>
+
+</div>
+
+<!-- ---------- Lightbox ---------- -->
+<div class="lightbox" id="lightbox">
+  <div class="lightbox-panel">
+    <div class="lightbox-head">
+      <div>
+        <p class="title" id="lb-title"></p>
+        <p class="subtext" id="lb-subtext"></p>
+      </div>
+      <div class="lightbox-actions">
+        <a id="lb-open" href="#" target="_blank" rel="noopener">Open in new tab</a>
+        <button id="lb-close">Close ✕</button>
+      </div>
+    </div>
+    <div class="lightbox-body">
+      <iframe id="lb-frame" src="about:blank"></iframe>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+  pdfjsLib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+  /* =====================================================================
+     EDIT THIS LIST — one entry per PDF you want to display.
+     file:    path or URL to the PDF (e.g. "pdfs/basin-poster.pdf")
+     title:   the caption shown on the specimen's label
+     subtext: the small detail line (course, term, etc.)
+     type:    "poster" | "essay" | "code"  — controls the accent dot/color
+     ===================================================================== */
+  const specimens = [
+    { file: "pdfs/basin-range-poster.pdf",   title: "Basin & Range Structural Analysis",     subtext: "Structural Geology — Fall 2024",     type: "poster" },
+    { file: "pdfs/karst-hydrology.pdf",      title: "Karst Hydrology of the Edwards Aquifer", subtext: "Hydrogeology — Spring 2024",         type: "essay"  },
+    { file: "pdfs/seismic-inversion.py.pdf", title: "Seismic Inversion Notebook",             subtext: "Geophysics Lab — Spring 2024",       type: "code"   },
+    { file: "pdfs/sedimentary-facies.pdf",   title: "Facies Mapping, Llano Uplift",           subtext: "Sedimentology — Fall 2023",          type: "poster" },
+    { file: "pdfs/mineral-id-report.pdf",    title: "Mineral Identification Report",          subtext: "Mineralogy — Fall 2023",             type: "essay"  },
+    { file: "pdfs/gis-watershed.pdf",        title: "Watershed Delineation in QGIS",          subtext: "GIS for Earth Science — Spring 2023",type: "code"   },
+  ];
+
+  const typeColor = {
+    poster: "var(--oxide)",
+    essay:  "var(--malachite)",
+    code:   "var(--sandstone-2)"
+  };
+
+  const grid = document.getElementById("grid");
+  document.getElementById("specimen-count").textContent =
+    `${specimens.length} specimen${specimens.length === 1 ? "" : "s"} catalogued`;
+
+  specimens.forEach((s, i) => {
+    const num = String(i + 1).padStart(2, "0");
+
+    const card = document.createElement("div");
+    card.className = "specimen";
+    card.tabIndex = 0;
+    card.setAttribute("role", "button");
+    card.setAttribute("aria-label", `Open ${s.title}`);
+
+    card.innerHTML = `
+      <div class="thumb-frame">
+        <div class="thumb-fallback" id="fallback-${i}">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" style="color:var(--slate)">
+            <path d="M4 3h11l5 5v13a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/>
+            <path d="M15 3v5h5"/>
+          </svg>
+          <span>No preview</span>
+        </div>
+        <canvas id="canvas-${i}"></canvas>
+        <div class="accession">No. ${num}</div>
+        <div class="type-tab" style="background:${typeColor[s.type] || "var(--slate)"}"></div>
+      </div>
+      <div class="plate">
+        <p class="title">${s.title}</p>
+        <p class="subtext">${s.subtext}</p>
+      </div>
+    `;
+
+    card.addEventListener("click", () => openLightbox(s));
+    card.addEventListener("keydown", e => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openLightbox(s); }
+    });
+
+    grid.appendChild(card);
+    renderThumbnail(s.file, i);
+  });
+
+  async function renderThumbnail(file, i) {
+    const canvas = document.getElementById(`canvas-${i}`);
+    const fallback = document.getElementById(`fallback-${i}`);
+    try {
+      const pdf = await pdfjsLib.getDocument(file).promise;
+      const page = await pdf.getPage(1);
+      const viewport = page.getViewport({ scale: 1 });
+      const scale = 500 / viewport.width;
+      const scaledViewport = page.getViewport({ scale });
+
+      canvas.width = scaledViewport.width;
+      canvas.height = scaledViewport.height;
+      const ctx = canvas.getContext("2d");
+      await page.render({ canvasContext: ctx, viewport: scaledViewport }).promise;
+
+      canvas.classList.add("loaded");
+      fallback.style.display = "none";
+    } catch (err) {
+      // File not found / not yet added — keep the fallback plate visible.
+      canvas.style.display = "none";
+    }
+  }
+
+  /* ---------- lightbox behavior ---------- */
+  const lightbox = document.getElementById("lightbox");
+  const lbTitle = document.getElementById("lb-title");
+  const lbSubtext = document.getElementById("lb-subtext");
+  const lbFrame = document.getElementById("lb-frame");
+  const lbOpen = document.getElementById("lb-open");
+
+  function openLightbox(s) {
+    lbTitle.textContent = s.title;
+    lbSubtext.textContent = s.subtext;
+    lbFrame.src = s.file;
+    lbOpen.href = s.file;
+    lightbox.classList.add("open");
+    document.body.style.overflow = "hidden";
+  }
+  function closeLightbox() {
+    lightbox.classList.remove("open");
+    lbFrame.src = "about:blank";
+    document.body.style.overflow = "";
+  }
+
+  document.getElementById("lb-close").addEventListener("click", closeLightbox);
+  lightbox.addEventListener("click", e => { if (e.target === lightbox) closeLightbox(); });
+  document.addEventListener("keydown", e => { if (e.key === "Escape") closeLightbox(); });
+</script>
+
+</body>
+</html>
